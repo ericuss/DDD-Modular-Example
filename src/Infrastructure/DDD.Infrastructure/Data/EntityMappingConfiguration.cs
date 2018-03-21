@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DDD.Infrastructure.Data
+{
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+
+    public abstract class EntityMappingConfiguration<T> : IEntityMappingConfiguration<T> where T : class
+    {
+        public abstract void Map(EntityTypeBuilder<T> b);
+
+        public void Map(ModelBuilder b)
+        {
+            Map(b.Entity<T>());
+        }
+    }
+}
