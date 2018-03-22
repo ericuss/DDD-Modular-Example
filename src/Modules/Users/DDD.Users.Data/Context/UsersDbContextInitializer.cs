@@ -7,6 +7,9 @@
     using System.Threading.Tasks;
     using DDD.Modules;
     using DDD.Users.Domain.Entities;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.IdentityModel.Tokens;
+    using System.Text;
 
     public class UsersDbContextInitializer
     {
@@ -30,12 +33,14 @@
                   options.UseSqlServer(settings.ConnectionStrings.Customer));
             }
 
-            this.ConfigureIdentity(services);
+            this.ConfigureIdentity(services, settings);
         }
 
-        private void ConfigureIdentity(IServiceCollection services)
+        private void ConfigureIdentity(IServiceCollection services, Settings settings)
         {
-            services.AddAuthentication();
+            // this shoud be moved
+            //services.AddAuthentication();
+          
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -57,6 +62,25 @@
             })
             .AddEntityFrameworkStores<UsersDbContext>()
             .AddDefaultTokenProviders();
+
+            services.AddAuthentication((cfg =>
+            {
+                cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = settings.JwtSecurityToken.Issuer,
+                    ValidAudience = settings.JwtSecurityToken.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.JwtSecurityToken.Key)),
+                    ValidateLifetime = true
+                };
+            });
+
         }
 
         private async Task Initialize(IServiceCollection services, string connectionString, string dbName, Settings settings)

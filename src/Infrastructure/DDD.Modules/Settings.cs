@@ -11,9 +11,19 @@ namespace DDD.Modules
             this.Modules = new List<Module>();
         }
 
-        public Database Database{ get; set; }
+        public Database Database { get; set; }
         public ConnectionStrings ConnectionStrings { get; set; }
+
+        public JwtSecurityToken JwtSecurityToken { get; set; }
+
         public List<Module> Modules { get; set; }
+    }
+
+    public class JwtSecurityToken
+    {
+        public string Key { get; set; }
+        public string Issuer { get; set; }
+        public string Audience { get; set; }
     }
 
     public class Database

@@ -2,6 +2,7 @@
 {
     using DDD.Application.Web.Extensions;
     using DDD.Modules;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -40,6 +41,8 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(this.Settings);
+
             // register custom services, modules, ...
             services.RegisterServices(this.Settings);
 
@@ -54,6 +57,21 @@
 
             // add swagger
             services.AddSwagger();
+
+            // add cors
+            services.AddCors(options =>
+            {
+                //options.AddPolicy("AllowSpecificOrigin",
+                //builder => builder.WithOrigins("http://localhost:8080"));
+                options.AddPolicy("AllowSpecificOrigin",
+                                    builder =>
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                                        );
+
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,10 +80,18 @@
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                // ad cors 
+                app.UseCors("AllowSpecificOrigin");
             }
 
             app.UseSwaggerAndUI();
-
+            //app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            //{
+            //    Audience = "http://localhost:5001/",
+            //    Authority = "http://localhost:5000/",
+            //    AutomaticAuthenticate = true
+            //});
             app.UseAuthentication();
 
             app.UseMvc();
