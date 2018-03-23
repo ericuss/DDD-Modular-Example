@@ -41,11 +41,11 @@
             this._settings = settings;
             this._logger = loggerFactory.CreateLogger<AccountsController>();
         }
-
-        [AllowAnonymous, HttpGet("Values")]
-        public IActionResult GetValues()
+        
+        [HttpGet]
+        public IActionResult Get()
         {
-            return this.Ok(new[] { "value1", "value2" });
+            return this.Ok(this._userManager.Users.ToList());
         }
 
         [HttpGet("Protected")]

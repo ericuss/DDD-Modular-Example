@@ -5,6 +5,5 @@
 
     public interface IAccountsController
     {
-        IActionResult GetValues();
     }
 }
